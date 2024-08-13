@@ -1,4 +1,4 @@
-package com.devmatheus.vendas.entities.resources;
+package com.devmatheus.vendas.resources;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
