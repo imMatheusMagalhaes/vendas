@@ -3,6 +3,7 @@ package com.devmatheus.vendas.entities;
 import java.io.Serializable;
 import java.time.Instant;
 
+import com.devmatheus.vendas.entities.enums.OrderStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -22,6 +23,7 @@ public class Order implements Serializable {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
   private Instant moment;
+  private String orderStatus;
 
   @ManyToOne
   @JoinColumn(name = "client_id")
@@ -30,9 +32,10 @@ public class Order implements Serializable {
   public Order() {
   }
 
-  public Order(Long id, Instant moment, User client) {
+  public Order(Long id, Instant moment, OrderStatus orderStatus, User client) {
     this.id = id;
     this.moment = moment;
+    setOrderStatus(orderStatus);
     this.client = client;
   }
 
@@ -60,6 +63,16 @@ public class Order implements Serializable {
     this.client = client;
   }
 
+  public OrderStatus getOrderStatus() {
+    return OrderStatus.statusOf(orderStatus);
+  }
+
+  public void setOrderStatus(OrderStatus orderStatus) {
+    if (orderStatus != null) {
+      this.orderStatus = orderStatus.getStatus();
+    }
+  }
+
   @Override
   public int hashCode() {
     final int prime = 31;
@@ -84,5 +97,4 @@ public class Order implements Serializable {
       return false;
     return true;
   }
-
 }
