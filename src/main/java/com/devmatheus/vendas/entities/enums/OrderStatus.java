@@ -3,25 +3,25 @@ package com.devmatheus.vendas.entities.enums;
 import org.hibernate.boot.model.naming.IllegalIdentifierException;
 
 public enum OrderStatus {
-  WAITING_PAYMENT("waiting_payment"),
-  PAID("paid"),
-  SHIPPED("shipped"),
-  DELIVERED("delivered"),
-  CANCELED("canceled");
+  WAITING_PAYMENT(1),
+  PAID(2),
+  SHIPPED(3),
+  DELIVERED(4),
+  CANCELED(5);
 
-  private String status;
+  private int code;
 
-  private OrderStatus(String status) {
-    this.status = status;
+  private OrderStatus(int code) {
+    this.code = code;
   }
 
-  public String getStatus() {
-    return status;
+  public int getCode() {
+    return code;
   }
 
-  public static OrderStatus statusOf(String status) {
+  public static OrderStatus valueOf(int code) {
     for (OrderStatus value : OrderStatus.values()) {
-      if (value.getStatus().equalsIgnoreCase(status)) {
+      if (value.getCode() == code) {
         return value;
       }
     }
