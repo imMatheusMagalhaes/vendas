@@ -13,7 +13,7 @@ import jakarta.persistence.Table;
 public class OrderItem implements Serializable {
 
     @EmbeddedId 
-    private OrderItemPK id;
+    private OrderItemPK id = new OrderItemPK();
 
     private Integer quantity;
     private Double price;
