@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Profile;
 import com.devmatheus.vendas.entities.Category;
 import com.devmatheus.vendas.entities.Order;
 import com.devmatheus.vendas.entities.OrderItem;
+import com.devmatheus.vendas.entities.Payment;
 import com.devmatheus.vendas.entities.Product;
 import com.devmatheus.vendas.entities.User;
 import com.devmatheus.vendas.entities.enums.OrderStatus;
@@ -78,7 +79,10 @@ public class TestConfig implements CommandLineRunner {
     p5.getCategories().add(cat2);
     
     productRepository.saveAll(Arrays.asList(p1, p2, p3, p4, p5));
-    
     itemRepository.saveAll(Arrays.asList(oi1, oi2, oi3, oi4));
+
+    Payment pay1 = new Payment(null, Instant.parse("2019-06-20T21:53:07Z"), o1);
+    o1.setPayment(pay1);
+    orderRepository.save(o1);
   }
 }
