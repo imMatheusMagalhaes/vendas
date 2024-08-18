@@ -49,6 +49,10 @@ public class Order implements Serializable {
     this.client = client;
   }
 
+  public Double getTotal() {
+    return items.stream().map((item) -> item.getSubTotal()).reduce((a, b) -> a + b).get();
+  }
+
   public Long getId() {
     return id;
   }
@@ -91,7 +95,7 @@ public class Order implements Serializable {
     this.payment = payment;
   }
 
-  public Set<OrderItem> getItems(){
+  public Set<OrderItem> getItems() {
     return items;
   }
 
