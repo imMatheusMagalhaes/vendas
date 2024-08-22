@@ -89,16 +89,20 @@ public class Order implements Serializable {
     this.client = client;
   }
 
+  public Set<OrderItem> getItems() {
+    return items;
+  }
+
+  public void setItem(OrderItem item) {
+    items.add(item);
+  }
+
   public Payment getPayment() {
     return payment;
   }
 
   public void setPayment(Payment payment) {
     this.payment = payment;
-  }
-
-  public Set<OrderItem> getItems() {
-    return items;
   }
 
   @Override
@@ -125,4 +129,16 @@ public class Order implements Serializable {
       return false;
     return true;
   }
+
+  @Override
+  public String toString() {
+    return "Order [id=" + id + ", moment=" + moment + ", orderStatus=" + orderStatus + ", client=" + client.getName()
+        + ", items="
+        + items.size() + ", payment=" + payment + ", getTotal()=" + "getTotal()" + ", getId()=" + getId()
+        + ", getMoment()="
+        + getMoment() + ", getOrderStatus()=" + getOrderStatus() + ", getClient()=" + getClient().getName()
+        + ", getPayment()="
+        + "getPayment().getMoment()" + ", getItems()=" + getItems().size() + "]";
+  }
+
 }

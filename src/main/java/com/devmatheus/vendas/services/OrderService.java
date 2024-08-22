@@ -1,8 +1,10 @@
 package com.devmatheus.vendas.services;
 
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,11 +14,13 @@ import com.devmatheus.vendas.entities.OrderItem;
 import com.devmatheus.vendas.entities.Payment;
 import com.devmatheus.vendas.entities.Product;
 import com.devmatheus.vendas.entities.User;
-import com.devmatheus.vendas.entities.dto.OrderItemDto;
+import com.devmatheus.vendas.entities.dto.CreateOrderDto;
+import com.devmatheus.vendas.entities.dto.UpdateOrderStatusDto;
 import com.devmatheus.vendas.entities.enums.OrderStatus;
 import com.devmatheus.vendas.repositories.OrderItemRepository;
 import com.devmatheus.vendas.repositories.OrderRepository;
 import com.devmatheus.vendas.services.exceptions.NotFoundException;
+import com.devmatheus.vendas.services.exceptions.UnauthorizedException;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -35,30 +39,33 @@ public class OrderService {
   @Autowired
   private ProductService productService;
 
-  public Order create(List<OrderItemDto> items) {
+  public Order create(List<CreateOrderDto> items) {
     // TODO: fazer autenticação para pegar user logado
-    User user = new User(null, "Maria Brown", "maria@gmail.com", "988888888", "123456");
-    user = userService.create(user);
+    User user = userService.findById(1L);
 
-    Order order = new Order();
-    order.setClient(user);
-    order.setOrderStatus(OrderStatus.WAITING_PAYMENT);
-    order.setMoment(Instant.now());
+    Order order = new Order(null, Instant.now(), OrderStatus.WAITING_PAYMENT, user);
     order = repository.save(order);
+    Set<OrderItem> orderItemSet = new HashSet<>();
 
-    for (OrderItemDto item : items) {
-      Product product = productService.findById(item.getProductId());
-      itemRepository.save(new OrderItem(order, product, item.getQuantity(), product.getPrice()));
+    for (CreateOrderDto item : items) {
+      Product product = productService.findById(item.productId());
+      OrderItem orderItem = new OrderItem(order, product, item.quantity(), product.getPrice());
+      orderItemSet.add(orderItem);
+      order.setItem(orderItem);
     }
-    return repository.save(order);
+    itemRepository.saveAll(orderItemSet);
+    return order;
   }
 
-  public OrderStatus updateStatus(Long orderId, OrderStatus status) {
+  public OrderStatus updateStatus(Long orderId, UpdateOrderStatusDto dto) {
     try {
+      if (dto.status() == OrderStatus.PAID) {
+        throw new UnauthorizedException();
+      }
       Order order = repository.getReferenceById(orderId);
-      order.setOrderStatus(status);
+      order.setOrderStatus(dto.status());
       repository.save(order);
-      return status;
+      return dto.status();
     } catch (EntityNotFoundException e) {
       throw new NotFoundException(orderId);
     }
@@ -68,6 +75,7 @@ public class OrderService {
     try {
       Order order = repository.getReferenceById(orderId);
       order.setPayment(new Payment(null, Instant.now(), order));
+      order.setOrderStatus(OrderStatus.PAID);
       repository.save(order);
     } catch (EntityNotFoundException e) {
       throw new NotFoundException(orderId);
@@ -80,6 +88,6 @@ public class OrderService {
 
   public Order findById(Long id) {
     Optional<Order> user = repository.findById(id);
-    return user.get();
+    return user.orElseThrow(() -> new NotFoundException(id));
   }
 }
