@@ -3,9 +3,15 @@ package com.devmatheus.vendas.entities;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashSet;
+import java.util.stream.Collectors;
 
+import java.util.Set;
+
+import com.devmatheus.vendas.entities.enums.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -21,9 +27,16 @@ public class User implements Serializable {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
   private String name;
+
+  @Column(unique = true)
   private String email;
+
+  @Column(unique = true)
   private String phone;
+
   private String password;
+
+  private Set<Integer> roles = new HashSet<>();
 
   @JsonIgnore
   @OneToMany(mappedBy = "client")
@@ -78,6 +91,16 @@ public class User implements Serializable {
 
   public void setPassword(String password) {
     this.password = password;
+  }
+
+  public Set<Role> getRoles() {
+    return roles.stream().map((code) -> Role.valueOf(code)).collect(Collectors.toSet());
+  }
+
+  public void setRole(Role role) {
+    if (role != null) {
+      roles.add(role.getCode());
+    }
   }
 
   public List<Order> getOrders() {
